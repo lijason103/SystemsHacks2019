@@ -21,16 +21,17 @@ var playerCounter = 0;
 var players = [];
 var map = [ ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'],
             ['w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w'],
+            ['w', 'e', 'w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w', 'w'],
+            ['w', 'e', 'e', 'w', 'e', 'e', 'w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w'],
+            ['w', 'e', 'e', 'e', 'w', 'e', 'w', 'e', 'e', 'e', 'e', 'e', 'w', 'e', 'w'],
+            ['w', 'e', 'e', 'w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w'],
+            ['w', 'e', 'e', 'w', 'e', 'e', 'e', 'e', 'w', 'w', 'e', 'e', 'e', 'e', 'w'],
             ['w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w'],
-            ['w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w'],
-            ['w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w'],
-            ['w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w'],
-            ['w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w', 'w'],
             ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'],];
 
 io.on('connection', function (socket) {
     console.log(`User Connected: ${socket.id}`)
-    if (playerCounter !== 4 ) {
+    if (playerCounter < 4 ) {
       players.push({
         id: socket.id,
         row: 1,
@@ -119,28 +120,28 @@ function placePlayers() {
 function movePlayerHorizontal (id, steps) {
   let playerIndex = getPlayerIndex(id);
   let player = players[playerIndex];
-  player.row = checkForWallHorizontal(player, steps);
-
+  player.column = checkForWallHorizontal(player, steps);
 }
 
 function movePlayerVertical (id, steps) {
   let playerIndex = getPlayerIndex(id);
   let player = players[playerIndex];
   player.row = checkForWallVertical(player, steps);
-
 }
 
 function checkForWallHorizontal (player, steps) {
-  for (let i = players.row+1; i < steps; i++) {
-    if (maps[i] === 'w') {
+  let playerRow = player.row;
+  for (let i = players.columns+1; i < steps; i++) {
+    if (maps[playerRow][i] === 'w') {
         return i-1;
     }
   }
 }
 
 function checkForWallVertical (player, steps) {
-  for (let i = players.column+1; i < steps; i++) {
-    if (maps[] === 'w') {
+  let playerColumn = player.column;
+  for (let i = players.row+1; i < steps; i++) {
+    if (maps[i][playerColumn] === 'w') {
         return i-1;
     }
   }
