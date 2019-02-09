@@ -143,7 +143,7 @@ function movePlayerVertical (socket, steps) {
   let playerIndex = getPlayerIndex(id); if (playerIndex > -1) {
     let player = players[playerIndex];
     player.row = player.row + checkForWallVertical(player, steps);
-    // console.log(player)
+    console.log(player)
     io.emit('player_update', player)
   }
 }

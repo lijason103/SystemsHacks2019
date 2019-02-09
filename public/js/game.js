@@ -22,11 +22,14 @@ var game = new Phaser.Game(config);
 
 function preload() {
     // Load map tiles
-    this.load.image('ground', 'assets/ground.png')
+    this.load.image('ground', 'assets/ground.png') // 2 types of grounds
+    this.load.image('floor', 'assets/floor.png')
     this.load.image('wall', 'assets/wall.png')
+    this.load.image('border', 'assets/border.png')
+    this.load.image('corner', 'assets/corner.png')
 
     // Load players
-    this.load.spritesheet('player', 'assets/player.png', { frameWidth: 32, frameHeight: 48})
+    this.load.spritesheet('player', 'assets/player.png', { frameWidth: 29.23, frameHeight: 40})
 
     // Variables
     this.players = []
@@ -37,7 +40,7 @@ function create() {
     // Load animations
     this.anims.create({
         key: 'stand',
-        frames: this.anims.generateFrameNumbers('player', { start: 4, end: 4 }),
+        frames: this.anims.generateFrameNumbers('player', { start: 16, end: 16 }),
         frameRate: 10,
         repeat: -1
     })
@@ -81,13 +84,22 @@ function create() {
 
     // Handle player update from server
     this.socket.on('player_update', player => {
+        console.log(player)
         let playerIndex = getPlayerIndex(this.players, player.id)
-        console.log(this.playerSprites)
         if (playerIndex > -1) {
             this.players[playerIndex] = player
             let playerSprite = this.playerSprites[playerIndex]
+            let x = calculateX(player.column, this.blockWidth)
+            let y = calculateY(player.row, this.blockHeight)
             // TODO: Add dashing animation
-            playerSprite.x = calculateX(player.column, this.blockWidth)
+            // playerSprite.x = calculateX(player.column, this.blockWidth)
+            let tween = this.tweens.add({
+                targets: playerSprite,
+                x: x,               // '+=100'
+                y: y,               // '+=100'
+                ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                duration: 100,
+            });
         }
     })
 }
@@ -135,7 +147,6 @@ function onTilePress(scene, pointer, row, column) {
         } else if (player.row === row) {   
             // send horizontal steps to server
             scene.socket.emit('player_move_horizontal', column - player.column)
-            console.log("here")
         } else if (player.column === column) {
             // send vertical steps to server
             scene.socket.emit('player_move_vertical', row - player.row)
