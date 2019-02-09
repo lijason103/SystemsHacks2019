@@ -61,6 +61,16 @@ io.on('connection', function (socket) {
       io.emit('disconnect', socket.id)
     });
 
+    // Handle player movement
+    socket.on('player_move_horizontal', steps => {
+        console.log(steps)
+        movePlayerHorizontal(socket, steps)
+    })
+
+    socket.on('player_move_vertical', steps => {
+        console.log(steps)
+    })
+
 });
 
 server.listen(8081, () => {
@@ -118,10 +128,15 @@ function placePlayers() {
   }
 }
 
-function movePlayerHorizontal (id, steps) {
+function movePlayerHorizontal(socket, steps) {
+    console.log("Here")
+  let id = socket.id
   let playerIndex = getPlayerIndex(id);
-  let player = players[playerIndex];
-  player.column = checkForWallHorizontal(player, steps);
+  if (playerIndex > -1) {
+      let player = players[playerIndex];
+      player.column = player.column + checkForWallHorizontal(player, steps);
+      io.emit('player_update', player)
+  }
 }
 
 function movePlayerVertical (id, steps) {
@@ -138,6 +153,7 @@ function checkForWallHorizontal (player, steps) {
     }
     checkForKill(row, playerColumn, players);
   }
+  return steps
 }
 
 function checkForWallVertical (player, steps) {

@@ -71,6 +71,17 @@ function create() {
         this.map = map
         renderMap(this)
     })
+
+    // Handle player update from server
+    this.socket.on('player_update', player => {
+        let playerIndex = getPlayerIndex(player.id)
+        if (playerIndex > -1) {
+            this.players[playerIndex] = player
+            let playerSprite = this.playerSprites[playerIndex]
+            // TODO: Add dashing animation
+            playerSprite.x = calculateX(player.column, this.blockWidth)
+        }
+    })
 }
 
 function update(time, delta) {
@@ -98,11 +109,29 @@ function renderMap(scene) {
                 image.displayHeight = scene.blockHeight
                 image.setInteractive()
                 image.on('pointerdown', pointer => {
-                    console.log(row, column)
+                    onTilePress(scene, pointer, row, column)
                 })
             }
         }
     }    
+}
+
+function onTilePress(scene, pointer, row, column) {
+    let playerIndex = getPlayerIndex(scene.players, scene.socket.id)
+    if (playerIndex > -1) {
+        let player = scene.players[playerIndex]
+        // only try to move if the row == player's row or
+        // column == player's column
+        if (player.row === row && player === column) {
+            // TODO: maybe do something?
+        } else if (player.row === row) {   
+            // send horizontal steps to server
+            scene.socket.emit('player_move_horizontal', column - player.column)
+        } else if (player.column === column) {
+            // send vertical steps to server
+            scene.socket.emit('player_move_vertical', row - player.row)
+        }
+    }
 }
 
 function renderPlayer(scene, player) {
@@ -121,3 +150,12 @@ function calculateY(row, blockHeight) {
     return row * blockHeight + blockHeight / 2
 }
 
+function getPlayerIndex(players, id) {
+    for (let i = 0; i < players.length; ++i) {
+        let player = players[i]
+        if (player.id === id) {
+            return i
+        }
+    }
+    return -1
+}
