@@ -63,11 +63,11 @@ io.on('connection', function (socket) {
 
     // Handle player movement
     socket.on('player_move_horizontal', steps => {
-        movePlayerHorizontal(socket, steps)
+        movePlayerHorizontal(socket, steps);
     })
 
     socket.on('player_move_vertical', steps => {
-        console.log(steps)
+        movePlayerVertical(socket, steps);
     })
 
 });
@@ -128,41 +128,57 @@ function placePlayers() {
 }
 
 function movePlayerHorizontal(socket, steps) {
-  let id = socket.id
+  let id = socket.id;
   let playerIndex = getPlayerIndex(id);
   if (playerIndex > -1) {
       let player = players[playerIndex];
       player.column = player.column + checkForWallHorizontal(player, steps);
-      console.log(player)
+      // console.log(player)
       io.emit('player_update', player)
   }
 }
 
-function movePlayerVertical (id, steps) {
-  let playerIndex = getPlayerIndex(id);
-  let player = players[playerIndex];
-  player.row = checkForWallVertical(player, steps);
+function movePlayerVertical (socket, steps) {
+  let id = socket.id;
+  let playerIndex = getPlayerIndex(id); if (playerIndex > -1) {
+    let player = players[playerIndex];
+    player.row = player.row + checkForWallVertical(player, steps);
+    // console.log(player)
+    io.emit('player_update', player)
+  }
 }
 
 function checkForWallHorizontal (player, steps) {
-  let playerRow = player.row;
-  for (let column = players.columns+1; column < steps; column++) {
-    if (maps[playerRow][column] === 'w') {
-        return column-1;
-    }
-    checkForKill(row, playerColumn, players);
+  let direction = 1;
+  if (steps < 0) {
+    direction = -1;
   }
-  return steps
+
+  for (let i = 1; i <= Math.abs(steps); ++i) {
+    let nextColumn = player.column + (i * direction);
+    if (map[player.row][nextColumn] === 'w') {
+        return (i - 1) * direction;
+    }
+    // checkForKill(player.row, nextColumn, players);
+  }
+  return steps;
 }
 
 function checkForWallVertical (player, steps) {
-  let playerColumn = player.column;
-  for (let row = players.row+1; row < steps; row++) {
-    if (maps[row][playerColumn] === 'w') {
-        return row-1;
-    }
-    checkForKill(row, playerColumn, players);
+  console.log(steps);
+  let direction = 1;
+  if (steps < 0) {
+    direction = -1;
   }
+
+  for (let i = 1; i <= Math.abs(steps); ++i) {
+    let nextRow = player.row + (i * direction);
+    if (map[nextRow][player.column] === 'w') {
+        return (i - 1) * direction;
+    }
+    // checkForKill(nextRow, player.column, players);
+  }
+  return steps;
 }
 
 function checkForKill (row, column, players) {
