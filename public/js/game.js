@@ -84,7 +84,6 @@ function create() {
 
     // Handle player update from server
     this.socket.on('player_update', player => {
-        console.log(player)
         let playerIndex = getPlayerIndex(this.players, player.id)
         if (playerIndex > -1) {
             this.players[playerIndex] = player
@@ -99,6 +98,22 @@ function create() {
                 y: y,               // '+=100'
                 ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
                 duration: 100,
+            });
+        }
+    })
+
+    // Handle player died
+    this.socket.on('player_died', player => {
+        let playerIndex = getPlayerIndex(this.players, player.id)
+        if (playerIndex > -1) {
+            this.players[playerIndex] = player
+            let playerSprite = this.playerSprites[playerIndex]
+            // playerSprite.disableBody(true, true)
+            let tween = this.tweens.add({
+                targets: playerSprite,
+                alpha: 0,
+                ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                duration: 1000,
             });
         }
     })
@@ -160,6 +175,9 @@ function renderPlayer(scene, player) {
     let sprite = scene.add.sprite(x, y, 'player')
     scene.playerSprites.push(sprite)
     sprite.anims.play('stand')
+    if (!player.isAlive) {
+        sprite.alpha = 0
+    }
 }
 
 function calculateX(column, blockWidth) {

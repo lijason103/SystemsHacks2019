@@ -132,9 +132,10 @@ function movePlayerHorizontal(socket, steps) {
   let playerIndex = getPlayerIndex(id);
   if (playerIndex > -1) {
       let player = players[playerIndex];
-      player.column = player.column + checkForWallHorizontal(player, steps);
-      // console.log(player)
-      io.emit('player_update', player)
+      if (player.isAlive) {
+        player.column = player.column + checkForWallHorizontal(player, steps);
+        io.emit('player_update', player)
+      }
   }
 }
 
@@ -142,9 +143,10 @@ function movePlayerVertical (socket, steps) {
   let id = socket.id;
   let playerIndex = getPlayerIndex(id); if (playerIndex > -1) {
     let player = players[playerIndex];
-    player.row = player.row + checkForWallVertical(player, steps);
-    console.log(player)
-    io.emit('player_update', player)
+    if (player.isAlive) {
+      player.row = player.row + checkForWallVertical(player, steps);
+      io.emit('player_update', player)
+    }
   }
 }
 
@@ -159,13 +161,19 @@ function checkForWallHorizontal (player, steps) {
     if (map[player.row][nextColumn] === 'w') {
         return (i - 1) * direction;
     }
-    // checkForKill(player.row, nextColumn, players);
+    
+    let playerDiedIndex = checkForKill(player.row, nextColumn, players)
+    if (playerDiedIndex > -1) {
+      // A player got killed
+      let playerDied = players[playerDiedIndex]
+      playerDied.isAlive = false
+      io.emit('player_died', players[playerDiedIndex])
+    }
   }
   return steps;
 }
 
 function checkForWallVertical (player, steps) {
-  console.log(steps);
   let direction = 1;
   if (steps < 0) {
     direction = -1;
@@ -176,7 +184,13 @@ function checkForWallVertical (player, steps) {
     if (map[nextRow][player.column] === 'w') {
         return (i - 1) * direction;
     }
-    // checkForKill(nextRow, player.column, players);
+    let playerDiedIndex = checkForKill(nextRow, player.column, players)
+    if (playerDiedIndex > -1) {
+      // A player got killed
+      let playerDied = players[playerDiedIndex]
+      playerDied.isAlive = false
+      io.emit('player_died', players[playerDiedIndex])
+    }
   }
   return steps;
 }
@@ -184,10 +198,9 @@ function checkForWallVertical (player, steps) {
 function checkForKill (row, column, players) {
   for (let i = 0; i < players.length; i++) {
     let otherPlayers = players[i];
-    if (otherPlayers.row === row && otherPlayers.column === column) {
-        otherPlayers.isAlive = false;
-        return true;
+    if (otherPlayers.row === row && otherPlayers.column === column && otherPlayers.isAlive) {
+        return i
     }
   }
-  return false;
+  return -1;
 }
