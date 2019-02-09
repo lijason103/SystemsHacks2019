@@ -34,6 +34,7 @@ io.on('connection', function (socket) {
     if (playerCounter < 4 ) {
       players.push({
         id: socket.id,
+        isAlive: true,
         row: 1,
         column: 1,
       })
@@ -131,22 +132,31 @@ function movePlayerVertical (id, steps) {
 
 function checkForWallHorizontal (player, steps) {
   let playerRow = player.row;
-  for (let i = players.columns+1; i < steps; i++) {
-    if (maps[playerRow][i] === 'w') {
-        return i-1;
+  for (let column = players.columns+1; column < steps; column++) {
+    if (maps[playerRow][column] === 'w') {
+        return column-1;
     }
+    checkForKill(row, playerColumn, players);
   }
 }
 
 function checkForWallVertical (player, steps) {
   let playerColumn = player.column;
-  for (let i = players.row+1; i < steps; i++) {
-    if (maps[i][playerColumn] === 'w') {
-        return i-1;
+  for (let row = players.row+1; row < steps; row++) {
+    if (maps[row][playerColumn] === 'w') {
+        return row-1;
     }
+    checkForKill(row, playerColumn, players);
   }
 }
 
-function checkForKill (steps, checkWall) {
-  
+function checkForKill (row, column, players) {
+  for (let i = 0; i < players.length; i++) {
+    let otherPlayers = players[i];
+    if (otherPlayers.row === row && otherPlayers.column === column) {
+        otherPlayers.isAlive = false;
+        return true;
+    }
+  }
+  return false;
 }
