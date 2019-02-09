@@ -26,14 +26,41 @@ function preload() {
     this.load.image('wall', 'assets/wall.png')
 
     // Load players
+    this.load.spritesheet('player', 'assets/player.png', { frameWidth: 32, frameHeight: 48})
+
+    // Variables
+    this.players = []
+    this.playerSprites = []
 }
 
 function create() {
+    // Load animations
+    this.anims.create({
+        key: 'stand',
+        frames: this.anims.generateFrameNumbers('player', { start: 4, end: 4 }),
+        frameRate: 10,
+        repeat: -1
+    })
+
     let sceneWidth = this.game.config.width
     let sceneHeight = this.game.config.height
     this.socket = io()
     this.socket.on('disconnect', id => {
         // Remove player and player sprite
+    })
+
+    this.socket.on('players', players => {
+        this.players = players
+        this.playerSprites = []
+        for (let i = 0; i < this.players.length; ++i) {
+            let player = this.players[i]
+            renderPlayer(this, player)
+        }
+    })
+
+    this.socket.on('newPlayer', player => {
+        this.players.push(player)
+        renderPlayer(this, player)
     })
 
     this.socket.on('map', map => {
@@ -70,5 +97,21 @@ function renderMap(scene) {
             }
         }
     }    
+}
+
+function renderPlayer(scene, player) {
+    let x = calculateX(player.column, scene.blockWidth)
+    let y = calculateX(player.row, scene.blockHeight)
+    let sprite = scene.add.sprite(x, y, 'player')
+    scene.playerSprites.push(sprite)
+    sprite.anims.play('stand')
+}
+
+function calculateX(column, blockWidth) {
+    return column * blockWidth + blockWidth / 2
+}
+
+function calculateY(row, blockHeight) {
+    return row * blockHeight + blockHeight / 2
 }
 
