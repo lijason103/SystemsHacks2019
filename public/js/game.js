@@ -56,6 +56,7 @@ function create() {
             let player = this.players[i]
             renderPlayer(this, player)
         }
+        console.log(players)
     })
 
     this.socket.on('newPlayer', player => {
@@ -86,14 +87,19 @@ function renderMap(scene) {
             // render wall
             if (tile == 'w') {
                 image = scene.add.sprite(x, y, 'wall')
-                image.displayWidth = scene.blockWidth
-                image.displayHeight = scene.blockHeight
             }
             // render floor
             if (tile == 'e') {
                 image = scene.add.sprite(x, y, 'ground')
+            }
+
+            if (image) {
                 image.displayWidth = scene.blockWidth
                 image.displayHeight = scene.blockHeight
+                image.setInteractive()
+                image.on('pointerdown', pointer => {
+                    console.log(row, column)
+                })
             }
         }
     }    
