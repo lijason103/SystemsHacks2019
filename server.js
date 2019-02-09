@@ -55,8 +55,17 @@ io.on('connection', function (socket) {
 
 });
 
-
-
 server.listen(8081, () => {
   	console.log(`Listening on ${server.address().port}`);
 });
+
+// Get player id
+function getPlayerIndex(id) {
+   for (let i = 0; i < players.length; ++i) {
+      let player = players[i];
+      if (player.id === id) {
+        return i;
+      }
+   }
+   return -1;
+}
