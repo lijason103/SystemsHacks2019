@@ -46,7 +46,14 @@ function create() {
     let sceneHeight = this.game.config.height
     this.socket = io()
     this.socket.on('disconnect', id => {
+        console.log(id, "Disconnected")
         // Remove player and player sprite
+        let playerIndex = getPlayerIndex(this.players, id)
+        if (playerIndex > -1) {
+            this.playerSprites[playerIndex].destroy()
+            this.players.splice(playerIndex, 1)
+            this.playerSprites.splice(playerIndex, 1)
+        }
     })
 
     this.socket.on('players', players => {
@@ -74,7 +81,8 @@ function create() {
 
     // Handle player update from server
     this.socket.on('player_update', player => {
-        let playerIndex = getPlayerIndex(player.id)
+        let playerIndex = getPlayerIndex(this.players, player.id)
+        console.log(this.playerSprites)
         if (playerIndex > -1) {
             this.players[playerIndex] = player
             let playerSprite = this.playerSprites[playerIndex]
@@ -127,6 +135,7 @@ function onTilePress(scene, pointer, row, column) {
         } else if (player.row === row) {   
             // send horizontal steps to server
             scene.socket.emit('player_move_horizontal', column - player.column)
+            console.log("here")
         } else if (player.column === column) {
             // send vertical steps to server
             scene.socket.emit('player_move_vertical', row - player.row)
@@ -151,7 +160,7 @@ function calculateY(row, blockHeight) {
 }
 
 function getPlayerIndex(players, id) {
-    for (let i = 0; i < players.length; ++i) {
+    for (let i = 0; i < players.length; i++) {
         let player = players[i]
         if (player.id === id) {
             return i

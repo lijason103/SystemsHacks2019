@@ -63,7 +63,6 @@ io.on('connection', function (socket) {
 
     // Handle player movement
     socket.on('player_move_horizontal', steps => {
-        console.log(steps)
         movePlayerHorizontal(socket, steps)
     })
 
@@ -129,12 +128,12 @@ function placePlayers() {
 }
 
 function movePlayerHorizontal(socket, steps) {
-    console.log("Here")
   let id = socket.id
   let playerIndex = getPlayerIndex(id);
   if (playerIndex > -1) {
       let player = players[playerIndex];
       player.column = player.column + checkForWallHorizontal(player, steps);
+      console.log(player)
       io.emit('player_update', player)
   }
 }
