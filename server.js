@@ -17,7 +17,6 @@ app.get('/', function (req, res) {
 var io = require('socket.io').listen(server);
 
 var maxNumberOfPlayers = 4;
-var playerCounter = 0;
 var players = [];
 var map = [ ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'],
             ['w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w'],
@@ -28,19 +27,24 @@ var map = [ ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w
             ['w', 'e', 'e', 'w', 'e', 'e', 'e', 'e', 'w', 'w', 'e', 'e', 'e', 'e', 'w'],
             ['w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w'],
             ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'],];
+var initialLocations = [[1, 1], 
+                       [1, map[1].length-1], 
+                       [map.length-1, 1], 
+                       [map.length-1, map[1].length-1]]
 
 io.on('connection', function (socket) {
     console.log(`User Connected: ${socket.id}`)
-    if (playerCounter < 4 ) {
+    let playerLocation = generatePlayerLocation();
+    if (players.length < 4 ) {
       players.push({
         id: socket.id,
         isAlive: true,
-        row: 1,
-        column: 1,
+        row: playerLocation[players.length-1][0],
+        column: playerLocation[players.length-1][1],
+        energy: 10,
       })
-    } 
-    else if (playerCounter === 4) {
-      // Print out cannot join, max number of players
+    }else {
+      return;
     }
 
     // Send player list to newly connected player
@@ -89,44 +93,6 @@ function getPlayerIndex(id) {
   return -1;
 }
 
-function placePlayers() {
-  let row = map.length - 1; // 0-4 --> 5 returns 4 for last row
-  let column = map[0].length - 1; // 0-5 --> returns 5 for last col
-
-  if (players.length === 2) {
-    let player2 = players[1];
-
-    player2.row = --row;
-    player2.column = --column;
-  }
-
-  if (players.length === 3) {
-    let player2 = players[1];
-    let player3 = players[2];
-
-    player2.row = --row;
-    player2.column = --column;
-
-    player3.row = row;
-    player3.column = 1;
-  }
-
-  if (players.length === 4) {
-    let player2 = players[1];
-    let player3 = players[2];
-    let player4 = players[3];
-
-    player2.row = --row;
-    player2.column = --column;
-
-    player3.row = row;
-    player3.column = 1;
-
-    player4.row = 1;
-    player4.column = column;
-  }
-}
-
 function movePlayerHorizontal(socket, steps) {
   let id = socket.id;
   let playerIndex = getPlayerIndex(id);
@@ -156,7 +122,7 @@ function checkForWallHorizontal (player, steps) {
     direction = -1;
   }
 
-  for (let i = 1; i <= Math.abs(steps); ++i) {
+  for (let i = 1; i <= Math.abs(steps); i++) {
     let nextColumn = player.column + (i * direction);
     if (map[player.row][nextColumn] === 'w') {
         return (i - 1) * direction;
@@ -179,7 +145,7 @@ function checkForWallVertical (player, steps) {
     direction = -1;
   }
 
-  for (let i = 1; i <= Math.abs(steps); ++i) {
+  for (let i = 1; i <= Math.abs(steps); i++) {
     let nextRow = player.row + (i * direction);
     if (map[nextRow][player.column] === 'w') {
         return (i - 1) * direction;
