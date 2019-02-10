@@ -34,10 +34,10 @@ function preload() {
 
 
     // Load players
-    this.load.spritesheet('player_0', 'assets/player_0.png', { frameWidth: 42.58, frameHeight: 58})
-    this.load.spritesheet('player_1', 'assets/player_1.png', { frameWidth: 42.58, frameHeight: 58})
-    this.load.spritesheet('player_2', 'assets/player_2.png', { frameWidth: 42.58, frameHeight: 58})
-    this.load.spritesheet('player_3', 'assets/player_3.png', { frameWidth: 42.58, frameHeight: 58})
+    this.load.spritesheet('player_0', 'assets/player_0.png', { frameWidth: 42.47, frameHeight: 55})
+    this.load.spritesheet('player_1', 'assets/player_1.png', { frameWidth: 42.47, frameHeight: 55})
+    this.load.spritesheet('player_2', 'assets/player_2.png', { frameWidth: 42.47, frameHeight: 55})
+    this.load.spritesheet('player_3', 'assets/player_3.png', { frameWidth: 42.47, frameHeight: 55})
 
     // Variables
     this.players = []
@@ -87,7 +87,8 @@ function create() {
         this.blockWidth = sceneWidth / map[0].length
         this.map = map
         renderMap(this)
-        this.energyText = this.add.text(sceneWidth/2 - 75, 16, 'Energy = 0', { fontSize: '28pt', fill: '#ffffff', fontFamily: 'VT323'})
+        this.energyText = this.add.text(sceneWidth/2 - 75, 16, 'ENERGY = 0', { fontSize: '28pt', fill: '#ffffff', fontFamily: 'VT323'})
+        this.restartText = this.add.text(16, 16, '', { fontSize: '28pt', fill: '#ffffff', fontFamily: 'VT323'})
     })
 
     // Handle player update from server
@@ -107,6 +108,9 @@ function create() {
                 ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
                 duration: 100,
             });
+            if (player.isAlive) {
+                playerSprite.alpha = 1
+            }
         }
     })
 
@@ -132,7 +136,15 @@ function update(time, delta) {
     // update energy
     if (myPlayerIndex > -1) {
         let myPlayer = this.players[myPlayerIndex]
-        this.energyText.setText(`Energy: ${myPlayer.energy}`)
+        this.energyText.setText(`ENERGY: ${myPlayer.energy}`)
+    }
+
+    if (myPlayerIndex === 0 && this.restartText.text !== 'RESTART') {
+        this.restartText.setText("RESTART")
+        this.restartText.setInteractive()
+        this.restartText.on('pointerdown', pointer => {
+            this.socket.emit('restart')
+        })
     }
 }
 
@@ -175,7 +187,6 @@ function renderMap(scene) {
             // render floor
             else if (tile == 'e') {
                 let randomizer = Math.random() * (5 - 1) + 1;
-                console.log(randomizer);
                 if (randomizer > 2) {
                     image = scene.add.sprite(x, y, 'floor')
                 }

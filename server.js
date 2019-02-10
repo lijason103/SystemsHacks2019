@@ -42,12 +42,14 @@ let timer = setInterval(function(){
   }
 }, 1000);
 
+var isGameOn = false
+
 io.on('connection', function (socket) {
     console.log(`User Connected: ${socket.id}`)
     if (players.length < 4 ) {
       players.push({
         id: socket.id,
-        isAlive: true,
+        isAlive: isGameOn ? false : true,
         row: initialLocations[players.length][0],
         column: initialLocations[players.length][1],
         energy: MAX_ENERGY,
@@ -81,6 +83,22 @@ io.on('connection', function (socket) {
 
     socket.on('player_move_vertical', steps => {
         movePlayerVertical(socket, steps);
+    })
+
+    socket.on('restart', () => {
+      console.log("restarting")
+      let playerIndex = getPlayerIndex(socket.id)
+      // player 0 is host
+      if (playerIndex === 0) {
+        for (let i = 0; i < players.length; ++i) {
+          let player = players[i]
+          player.energy = MAX_ENERGY
+          player.isAlive =  true
+          player.row = initialLocations[i][0],
+          player.column = initialLocations[i][1],
+          io.emit('player_update', player)
+        }
+      }
     })
 
 });
