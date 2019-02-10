@@ -127,7 +127,9 @@ function create() {
                 ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
                 duration: 1000,
             });
+            this.cameras.main.flash()
         }
+
     })
 }
 
