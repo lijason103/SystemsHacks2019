@@ -28,9 +28,13 @@ var map = [ ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w
             ['w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w'],
             ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'],];
 var initialLocations = [[1, 1], 
-                        [map.length-2, map[1].length-2],
-                        [map.length-2, 1], 
-                        [1, map[1].length-2]]
+                       [map.length-2, map[1].length-2]
+                       [1, map[1].length-2], 
+                       [map.length-2, 1]]
+
+var timer = setInterval(function(){
+      rechargeEnergy();
+}, 1000);
 
 io.on('connection', function (socket) {
     console.log(`User Connected: ${socket.id}`)
@@ -97,10 +101,11 @@ function movePlayerHorizontal(socket, steps) {
   let playerIndex = getPlayerIndex(id);
   if (playerIndex > -1) {
       let player = players[playerIndex];
-      if (player.isAlive) {
-        player.column = player.column + checkForWallHorizontal(player, steps);
-        io.emit('player_update', player)
-      }
+    if (player.isAlive && player.energy > Math.abs(steps)) {
+      player.column = player.column + checkForWallHorizontal(player, steps);
+      player.energy -= Math.abs(steps);
+      io.emit('player_update', player)
+    }
   }
 }
 
@@ -108,8 +113,9 @@ function movePlayerVertical (socket, steps) {
   let id = socket.id;
   let playerIndex = getPlayerIndex(id); if (playerIndex > -1) {
     let player = players[playerIndex];
-    if (player.isAlive) {
+    if (player.isAlive  && player.energy > Math.abs(steps)) {
       player.row = player.row + checkForWallVertical(player, steps);
+      player.energy -= Math.abs(steps);
       io.emit('player_update', player)
     }
   }
@@ -164,8 +170,17 @@ function checkForKill (row, column, players) {
   for (let i = 0; i < players.length; i++) {
     let otherPlayers = players[i];
     if (otherPlayers.row === row && otherPlayers.column === column && otherPlayers.isAlive) {
-        return i
+        return i;
     }
   }
   return -1;
+}
+
+function rechargeEnergy () {
+  for (let i = 0; i < players.length; i++) {
+    let player = players[i];
+    if (player.energy < 10) {
+      energy++;
+    }
+  }
 }
