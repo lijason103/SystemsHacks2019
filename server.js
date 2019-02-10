@@ -16,7 +16,6 @@ app.get('/', function (req, res) {
 
 var io = require('socket.io').listen(server);
 
-var maxNumberOfPlayers = 4;
 const MAX_ENERGY = 20;
 var players = [];
 var map = [ ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'],
@@ -187,8 +186,8 @@ function rechargeEnergy(amount) {
   for (let i = 0; i < players.length; i++) {
     let player = players[i];
     if (player.energy < MAX_ENERGY) {
-      if (player.energy + amount > MAX_ENERGY) {
-        player.engery = MAX_ENERGY
+      if (player.energy + amount >= MAX_ENERGY) {
+        player.energy = MAX_ENERGY
       } else {
         player.energy += amount;
       }
