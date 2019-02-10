@@ -33,7 +33,7 @@ var initialLocations = [[1, 1],
                        [map.length-2, 1]]
 
 let timer = setInterval(function(){
-  let amount = 2
+  let amount = 1
   rechargeEnergy(amount)
   for(let i = 0; i < players.length; ++i) {
     let player = players[i]

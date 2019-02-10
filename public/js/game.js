@@ -15,7 +15,7 @@ var config = {
         preload: preload,
         create: create,
         update: update,
-    }
+    },
 };
 
 var game = new Phaser.Game(config);
@@ -87,7 +87,7 @@ function create() {
         this.blockWidth = sceneWidth / map[0].length
         this.map = map
         renderMap(this)
-        this.energyText = this.add.text(16, 16, 'Energy = 0', { fontSize: '32px', fill: '#000'})
+        this.energyText = this.add.text(sceneWidth/2 - 75, 16, 'Energy = 0', { fontSize: '28pt', fill: '#ffffff', fontFamily: 'VT323'})
     })
 
     // Handle player update from server
