@@ -28,19 +28,18 @@ var map = [ ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w
             ['w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w'],
             ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'],];
 var initialLocations = [[1, 1], 
-                       [1, map[1].length-1], 
-                       [map.length-1, 1], 
-                       [map.length-1, map[1].length-1]]
+                        [map.length-2, map[1].length-2],
+                        [map.length-2, 1], 
+                        [1, map[1].length-2]]
 
 io.on('connection', function (socket) {
     console.log(`User Connected: ${socket.id}`)
-    let playerLocation = generatePlayerLocation();
     if (players.length < 4 ) {
       players.push({
         id: socket.id,
         isAlive: true,
-        row: playerLocation[players.length-1][0],
-        column: playerLocation[players.length-1][1],
+        row: initialLocations[players.length][0],
+        column: initialLocations[players.length][1],
         energy: 10,
       })
     }else {

@@ -29,7 +29,10 @@ function preload() {
     this.load.image('corner', 'assets/corner.png')
 
     // Load players
-    this.load.spritesheet('player', 'assets/player.png', { frameWidth: 29.23, frameHeight: 40})
+    this.load.spritesheet('player_0', 'assets/player_0.png', { frameWidth: 29.23, frameHeight: 40})
+    this.load.spritesheet('player_1', 'assets/player_1.png', { frameWidth: 29.23, frameHeight: 40})
+    this.load.spritesheet('player_2', 'assets/player_2.png', { frameWidth: 29.23, frameHeight: 40})
+    this.load.spritesheet('player_3', 'assets/player_3.png', { frameWidth: 29.23, frameHeight: 40})
 
     // Variables
     this.players = []
@@ -39,8 +42,8 @@ function preload() {
 function create() {
     // Load animations
     this.anims.create({
-        key: 'stand',
-        frames: this.anims.generateFrameNumbers('player', { start: 16, end: 16 }),
+        key: 'stand_0',
+        frames: this.anims.generateFrameNumbers('player_0', { start: 16, end: 16 }),
         frameRate: 10,
         repeat: -1
     })
@@ -66,7 +69,6 @@ function create() {
             let player = this.players[i]
             renderPlayer(this, player)
         }
-        console.log(players)
     })
 
     this.socket.on('newPlayer', player => {
@@ -172,9 +174,12 @@ function onTilePress(scene, pointer, row, column) {
 function renderPlayer(scene, player) {
     let x = calculateX(player.column, scene.blockWidth)
     let y = calculateX(player.row, scene.blockHeight)
-    let sprite = scene.add.sprite(x, y, 'player')
+    let sprite = scene.add.sprite(x, y, `player_0`)
+    if (player.id !== scene.socket.id) {
+        sprite.setTint(0xef5350)
+    }
     scene.playerSprites.push(sprite)
-    sprite.anims.play('stand')
+    sprite.anims.play(`stand_0`)
     if (!player.isAlive) {
         sprite.alpha = 0
     }
