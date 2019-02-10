@@ -34,10 +34,10 @@ function preload() {
 
 
     // Load players
-    this.load.spritesheet('player_0', 'assets/player_0.png', { frameWidth: 29.23, frameHeight: 40})
-    this.load.spritesheet('player_1', 'assets/player_1.png', { frameWidth: 29.23, frameHeight: 40})
-    this.load.spritesheet('player_2', 'assets/player_2.png', { frameWidth: 29.23, frameHeight: 40})
-    this.load.spritesheet('player_3', 'assets/player_3.png', { frameWidth: 29.23, frameHeight: 40})
+    this.load.spritesheet('player_0', 'assets/player_0.png', { frameWidth: 42.58, frameHeight: 58})
+    this.load.spritesheet('player_1', 'assets/player_1.png', { frameWidth: 42.58, frameHeight: 58})
+    this.load.spritesheet('player_2', 'assets/player_2.png', { frameWidth: 42.58, frameHeight: 58})
+    this.load.spritesheet('player_3', 'assets/player_3.png', { frameWidth: 42.58, frameHeight: 58})
 
     // Variables
     this.players = []
