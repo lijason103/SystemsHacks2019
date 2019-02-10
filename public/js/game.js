@@ -82,6 +82,7 @@ function create() {
         this.blockWidth = sceneWidth / map[0].length
         this.map = map
         renderMap(this)
+        this.energyText = this.add.text(16, 16, 'Energy = 0', { fontSize: '32px', fill: '#000'})
     })
 
     // Handle player update from server
@@ -122,6 +123,12 @@ function create() {
 }
 
 function update(time, delta) {
+    let myPlayerIndex = getPlayerIndex(this.players, this.socket.id)
+    // update energy
+    if (myPlayerIndex > -1) {
+        let myPlayer = this.players[myPlayerIndex]
+        this.energyText.setText(`Energy: ${myPlayer.energy}`)
+    }
 }
 
 function renderMap(scene) {

@@ -17,6 +17,7 @@ app.get('/', function (req, res) {
 var io = require('socket.io').listen(server);
 
 var maxNumberOfPlayers = 4;
+const MAX_ENERGY = 20;
 var players = [];
 var map = [ ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'],
             ['w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w'],
@@ -28,12 +29,18 @@ var map = [ ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w
             ['w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'w'],
             ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'],];
 var initialLocations = [[1, 1], 
-                       [map.length-2, map[1].length-2]
+                       [map.length-2, map[1].length-2],
                        [1, map[1].length-2], 
                        [map.length-2, 1]]
 
-var timer = setInterval(function(){
-      rechargeEnergy();
+let timer = setInterval(function(){
+  let amount = 2
+  rechargeEnergy(amount)
+  for(let i = 0; i < players.length; ++i) {
+    let player = players[i]
+    // TODO: make a single emit that update all players
+    io.emit('player_update', player)
+  }
 }, 1000);
 
 io.on('connection', function (socket) {
@@ -44,7 +51,7 @@ io.on('connection', function (socket) {
         isAlive: true,
         row: initialLocations[players.length][0],
         column: initialLocations[players.length][1],
-        energy: 10,
+        energy: MAX_ENERGY,
       })
     }else {
       return;
@@ -176,11 +183,15 @@ function checkForKill (row, column, players) {
   return -1;
 }
 
-function rechargeEnergy () {
+function rechargeEnergy(amount) {
   for (let i = 0; i < players.length; i++) {
     let player = players[i];
-    if (player.energy < 10) {
-      energy++;
+    if (player.energy < MAX_ENERGY) {
+      if (player.energy + amount > MAX_ENERGY) {
+        player.engery = MAX_ENERGY
+      } else {
+        player.energy += amount;
+      }
     }
   }
 }
