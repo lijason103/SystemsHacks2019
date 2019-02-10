@@ -26,7 +26,12 @@ function preload() {
     this.load.image('floor', 'assets/floor.png')
     this.load.image('wall', 'assets/wall.png')
     this.load.image('border', 'assets/border.png')
-    this.load.image('corner', 'assets/corner.png')
+    this.load.image('corner', 'assets/Corner.png')
+    this.load.image('corner_1', 'assets/corner_1.png')
+    this.load.image('corner_2', 'assets/corner_2.png')
+    this.load.image('corner_3', 'assets/corner_3.png')
+    this.load.image('wall_horizontal', 'assets/wall_horizontal.png')
+
 
     // Load players
     this.load.spritesheet('player_0', 'assets/player_0.png', { frameWidth: 29.23, frameHeight: 40})
@@ -140,12 +145,43 @@ function renderMap(scene) {
             let tile = map[row][column]
             let image
             // render wall
-            if (tile == 'w') {
+            if (column === 0 && row === 0) {
+                image = scene.add.sprite(x, y, 'corner')
+            }
+            else if (column === 0 && row === map.length-1) {
+                image = scene.add.sprite(x, y, 'corner_3')
+            }
+            else if (column === map[0].length-1 && row === 0) {
+                image = scene.add.sprite(x, y, 'corner_2')
+            }
+            else if (column === map[0].length-1 && row === map.length-1) {
+                image = scene.add.sprite(x, y, 'corner_1')
+            }
+            else if (row === 0 && column !== 0 || row === 0 && column !== 14) {
+                image = scene.add.sprite(x, y, 'wall_horizontal')
+            }
+            else if (row === 8 && column !== 0 || row === 8 && column !== 14) {
+                image = scene.add.sprite(x, y, 'wall_horizontal')
+            }
+            else if (column === 0 && row !== 0 || column === 0 && row !== 8) {
+                image = scene.add.sprite(x, y, 'border')
+            }
+            else if (column === 14 && row !== 0 || column === 14 && row !== 8) {
+                image = scene.add.sprite(x, y, 'border')
+            }
+            else if (tile == 'w') {
                 image = scene.add.sprite(x, y, 'wall')
             }
             // render floor
-            if (tile == 'e') {
-                image = scene.add.sprite(x, y, 'ground')
+            else if (tile == 'e') {
+                let randomizer = Math.random() * (5 - 1) + 1;
+                console.log(randomizer);
+                if (randomizer > 2) {
+                    image = scene.add.sprite(x, y, 'floor')
+                }
+                else {
+                    image = scene.add.sprite(x, y, 'ground')
+                }
             }
 
             if (image) {
