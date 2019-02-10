@@ -39,6 +39,9 @@ function preload() {
     this.load.spritesheet('player_2', 'assets/player_2.png', { frameWidth: 42.47, frameHeight: 55})
     this.load.spritesheet('player_3', 'assets/player_3.png', { frameWidth: 42.47, frameHeight: 55})
 
+    // Load audio 
+    this.load.audio('music', 'assets/music.ogg')
+
     // Variables
     this.players = []
     this.playerSprites = []
@@ -52,6 +55,8 @@ function create() {
         frameRate: 10,
         repeat: -1
     })
+
+    this.sound.add('music').play()
 
     let sceneWidth = this.game.config.width
     let sceneHeight = this.game.config.height
