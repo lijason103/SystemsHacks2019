@@ -56,8 +56,9 @@ function create() {
         repeat: -1
     })
 
-    this.sound.add('music').play()
-
+    // Plays and loops the music
+    this.sound.add('music').play( {loop: true} )
+    
     let sceneWidth = this.game.config.width
     let sceneHeight = this.game.config.height
     this.socket = io()
