@@ -4,6 +4,7 @@
 * Two protocols: players move horizontal & vertical
 * Allow player to join
 */
+var PORT = process.env.PORT || 8081;
 var express = require('express');
 var app = express();
 var server = require('http').Server(app);
@@ -103,7 +104,7 @@ io.on('connection', function (socket) {
 
 });
 
-server.listen(8081, () => {
+server.listen(PORT, () => {
   	console.log(`Listening on ${server.address().port}`);
 });
 
